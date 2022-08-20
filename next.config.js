@@ -4,6 +4,10 @@ const API_KEY = "10923b261ba94d897ac6b81148314a3f";
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  experimental: { images: { allowFutureImage: true } },
+  images: {
+    domains: ["i.scdn.co"],
+  },
   async redirects() {
     return [
       {
@@ -25,8 +29,6 @@ const nextConfig = {
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
-
-
+module.exports = nextConfig;

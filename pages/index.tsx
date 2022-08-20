@@ -1,38 +1,57 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Seo from "../components/Seo";
+import axios from "axios"
 
 const CLIENT_ID = "90b84ea4836b42a889af2ed042e1f2d3";
-const REDIRECT_URI = "http://localhost:3000";
+const REDIRECT_URI = "http://localhost:3000/artists/list";
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
 const RESPONSE_TYPE = "token";
 
 export default function Home({ results }) {
   const [token, setToken] = useState<string>("");
   const router = useRouter();
-  const onClick = (id:string, title:string) => {
-    router.push(`/movies/${title}/${id}`);
-  };
+  // const onClick = (id: string, title: string) => {
+  //   router.push(`/movies/${title}/${id}`);
+  // };
   useEffect(() => {
     const hash = window.location.hash;
     let token = window.localStorage.getItem("token");
 
     if (!token && hash) {
-      token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1];
+      token = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        .split("=")[1];
       window.location.hash = "";
       window.localStorage.setItem("token", token);
     }
-  }, [])
+
+    setToken(token);
+  }, []);
+
+  const logout = () => {
+    setToken("");
+    window.localStorage.removeItem("token");
+  };
+
+  
   return (
     <div className="container">
       <Seo title="Home" />
-      <a
-        href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
-      >
-        Login to Spotify
-      </a>
-
+      {!token ? (
+        <a
+        className="login"
+          href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
+        >
+          Login to Spotify
+        </a>
+      ) : (
+        <button onClick={logout}>Logout</button>
+      )}
       {/* {results?.map((movie) => (
         <div
           onClick={() => onClick(movie.id, movie.original_title)}
@@ -54,7 +73,7 @@ export default function Home({ results }) {
           padding: 20px;
           gap: 20px;
         }
-        .movie {
+        .login {
           cursor: pointer;
         }
         .movie img {
